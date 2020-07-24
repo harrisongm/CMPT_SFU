@@ -1,0 +1,12 @@
+d)       [3 marks] Write a C++ function named multiPersistArr that takes a static array of integer and its size n as arguments and populates the array with the multiplicative persistence of the first n integers greater than or equal to 0, [0, n -1]. 
+(You must call your function defined in part c) when answering this question).
+
+ 
+
+----------------------------------------
+
+
+
+e)      [4 marks] Write a C++ program (main function) that declares a static array of size 1000 and populates the array with multiplicative persistence of the numbers from 0 to 999. Then it finds and prints ALL the numbers in the range [0, 999] that have the multiplicative persistence of 5 by using the function findIndex defined in part b. (You must use your functions defined in parts b) and d) when answering this question).
+
+ You are NOT allowed to call your function muliPersist defined in part c) when answering this question.
