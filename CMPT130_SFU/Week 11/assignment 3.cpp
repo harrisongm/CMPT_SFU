@@ -14,6 +14,13 @@ int cstrlen(const charPointer& s)
 int countChars(const charPointer& s, const char& ch)
 {
 	//returns the number of times the character ch is found in s
+	int count = 0;
+	for(int i = 0; i < sizeof(s); i++)
+	{
+		if(ch == s[i])
+			count += 1;
+	}
+	return count;
 }
 
 int findChar(const charPointer& s, const char& ch, const int& startIndex = 0, const int& lastIndexTemp = -1)
