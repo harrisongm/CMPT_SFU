@@ -7,6 +7,8 @@ typedef char* charPointer;
 int cstrlen(const charPointer& s)
 {
 	//returns the number of printable characters in s
+	int length = sizeof(s) / sizeof(s[0]);
+	return length;
 }
 
 int countChars(const charPointer& s, const char& ch)
