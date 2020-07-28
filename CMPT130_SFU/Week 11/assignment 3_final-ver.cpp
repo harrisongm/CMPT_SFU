@@ -7,15 +7,18 @@ typedef char* charPointer;
 int cstrlen(const charPointer& s)
 {
 	//returns the number of printable characters in s
-	int length = sizeof(s) / sizeof(s[0]);
-	return length;
+	int index = 0;
+	while(s[index] != '\0')
+		index++;
+	return index;
 }
 
 int countChars(const charPointer& s, const char& ch)
 {
 	//returns the number of times the character ch is found in s
 	int count = 0;
-	for(int i = 0; i < sizeof(s); i++)
+	int size = cstrlen(s);
+	for(int i = 0; i < size; i++)
 	{
 		if(ch == s[i])
 			count += 1;
@@ -39,16 +42,21 @@ int findChar(const charPointer& s, const char& ch, const int& startIndex = 0, co
 	This function must first validate both the startIndex and lastIndex.
 	That is, if lastIndex > cstrlen(s) or startIndex < 0 it must return -1
 	*/
-	int count = 0;
-	for(int j = startIndex; j < sizeof(s); j++)
+	//cout<<"testing: "<<lastIndexTemp<<endl;
+	int len = cstrlen(s);
+	int size = -1;
+	if (startIndex >= 0 && lastIndexTemp == -1 )
+		size = len;
+	else
+		size = lastIndexTemp;
+
+	for(int j = startIndex; j < size; j++)
 	{
-		if(ch != s[j])
-			count += 1;
+		if(ch == s[j])
+			return j;
 	}
-	if(count == 0)
-		return -1;
-	if(count != 0)
-		return count;
+
+	return -1;
 }
 
 charPointer getCopy(const charPointer& s)
@@ -59,11 +67,13 @@ charPointer getCopy(const charPointer& s)
 	the cstring s is created and then all the characters of 
 	s including the null char are copied to it.
 	*/
-	char temp = new char[sizeof(s) + 1];
-	for(int k = 0; k <sizeof(s); k++)
+	int size = cstrlen(s);
+	char *temp = new char[size+1];
+	for(int k = 0; k <size; k++)
 	{
 		temp[k] = s[k];
 	}
+	temp[size] = '\0';
 	return temp;
 }
 
@@ -96,31 +106,46 @@ void rotateString(const charPointer& s, const int& r)
 			"asmara" rotated to the right by 7 becomes "aasmar" 
 			"asmara" rotated to the right by 8 becomes "raasma" 
 
-			and etcâ€¦ 
+			and etc… 
 	*/
+	int size = cstrlen(s);
 	if(r > 0)
 	{
-		char temp;
-		int n = r;
-		for(int l = 0; l < n; l++)
-		{
-			temp = s[0];
-			for(int m = 0; m < sizeof(s) - 1; m++)
-				s[m] = s[m + 1];
+		int num = r%size;
+		int index = 0;
+		char* temp = new char[num];
+		for(int i = 0; i<num; i++)
+			temp[i] = s[i];
+		
+		for(int j = num; j<size; j++) {
+			s[index++] = s[j];
 		}
-		s[sizeof(s) - 1] = temp;
+
+		index = 0;
+		for(int k = size-num; k<size; k++)
+		{
+			s[k] = temp[index++]; 
+		}
+
+		delete[] temp;
 	}
+
 	if(r < 0)
 	{
-		char temp;
-		int n = r * -1;
-		for(int l = 0; l < n; l++)
-		{
-			temp = s[sizeof(s) - 1];
-			for(int m = sizeof(s) - 1; m > 0; m--)
-				s[m] = s[m - 1];
-		}
-		s[0] = temp;
+		int num = (-1*r) % size;
+		char* temp = new char[num];
+		int index=0;
+		for(int i = size-num; i<size; i++)
+			temp[index++] = s[i];
+
+		for(int j= size-1; j>num; j--)
+			s[j] = s[j-num];
+
+		for(int k=0; k<num; k++)
+			s[k] = temp[k];
+
+		delete[] temp;
+
 	}
 }
 void empty(charPointer& s)
@@ -131,8 +156,13 @@ void empty(charPointer& s)
 	allocated so that s will have no printable characters but it will
 	still have a null character at the end.
 	*/
-	char* temp = new char('\0');
-	return temp;
+	int size = cstrlen(s);
+	if (size != 0)
+	{
+		delete [] s;
+		s = new char[1];
+		s[0]='\0';
+	}
 }
 void append(charPointer& s, const char& ch)
 {
@@ -151,7 +181,7 @@ void append(charPointer& s, const char& ch)
 	C[newLen] = '\0';
 	delete[] s;
 	s = C;
-	return;
+
 }
 
 void append(charPointer& s1, const charPointer& s2)
@@ -161,7 +191,8 @@ void append(charPointer& s1, const charPointer& s2)
 		The parameter s1 is assumed to be a dynamic array (NOT a static array)
 	Hint: Use the append(charPointer& s, const char& ch) function above.
 	*/
-	for(int i = 0; i < sizeof(s2); i++)
+	int len = cstrlen(s2);
+	for(int i = 0; i < len; i++)
 	{
 		append(s1, s2[i]);
 	}
@@ -235,18 +266,20 @@ bool isAnagram(const charPointer& s1, const charPointer& s2)
 		That is, this function returns true if s1 and s2 are permutations (re-arrangements) of each other.
 		For example "TEST" and "STET" are anagrams but "CPMT" and "CMPTM" are not anagrams
 	*/
-	int different = 0;
-	for(int i = 0; i < sizeof(s1); i++)
-	{
-		for(int j = 0; j < sizeof(s2); j++)
+	int size1 = cstrlen(s1);
+	int size2 = cstrlen(s2);
+	if (size1 == size2)
+	{ 
+		for(int i =0; i<size1; i++)
 		{
-			if(s1[i] == s2[j])
-				different += 1;
+			int count1 = countChars(s1, s1[i]);
+			int count2 = countChars(s2, s1[i]);
+			if (count1 != count2)
+				return false;
 		}
-	}
-	if(different < sizeof(s1))
 		return true;
-	else
+
+	} else
 		return false;
 }
 
@@ -266,41 +299,26 @@ charPointer zigzagMerge(const charPointer& s1, const charPointer& s2)
 		appended to the new cstring
 		For example, the zigzagMerge of "abc" and "defgh" will be "adbecfgh"
 	*/
-	char* merge = new char[];
-	if(sizeof(s1) < sizeof(s2))
+	int size1 = cstrlen(s1);
+	int size2 = cstrlen(s2);
+	int size = size1 + size2;
+	char* merge = new char[size+1];
+	
+	int index=0, index1=0, index2=0;
+	while(index < size)
 	{
-		for(int i = sizeof(s2); i > 0; i--)
-		{
-			if(i > sizeof(s1))
-			{
-				merge[i] = s2[i];
-			}
-			else if(i <= sizeof(s1))
-			{
-				if(i / 2 != 0)
-					merge[i] = s2[i];
-				else
-					merge[i] = s1[i];
-			}
-		}
+		if(index1 < size1 && index%2== 0)
+			merge[index++] = s1[index1++];
+		else if(index2 < size2 && index%2== 1)
+			merge[index++] = s2[index2++];
+		else if (index1 < size1)
+			merge[index++] = s1[index1++];
+		else
+			merge[index++] = s2[index2++];
+
 	}
-	else
-	{
-		for(int i = sizeof(s1); i > 0; i--)
-		{
-			if(i > sizeof(s2))
-			{
-				merge[i] = s1[i];
-			}
-			else if(i <= sizeof(s2))
-			{
-				if(i / 2 != 0)
-					merge[i] = s1[i];
-				else
-					merge[i] = s2[i];
-			}
-		}
-	}
+	merge[size] = '\0';
+
 	return merge;
 }
 
@@ -313,7 +331,16 @@ charPointer getSubString(const charPointer& s, const int& startIndex, const int&
 		characters starting from the startIndex upto its last character in which case, 
 		the returned substring will have less than len characters.
 	*/
+	int size = cstrlen(s);
+	if (size > startIndex+len)
+		size = len;
+	char* temp = new char[size+1];
+	int index=startIndex;
+	for(int i=0; i<size; i++)
+		temp[i] = s[index++];
 
+	temp[size] ='\0';
+	return temp;
 }
 
 bool isSubString(const charPointer& s1, const charPointer& s2)
@@ -325,6 +352,27 @@ bool isSubString(const charPointer& s1, const charPointer& s2)
 		Example "set" is a substring of "massachussettes" But "ets" is not substring of "massachussettes"
 	Hint: Use the getSubString(const charPointer& s, const int& startIndex, const int& len) function above.
 	*/
+
+	int size2 = cstrlen(s2);
+	int size1 = cstrlen(s1);
+	if(size1 > size2)
+		return false;
+	if(size1 == 0)
+		return true;
+
+	for(int i=0; i<size2; i++)
+	{
+		if(s2[i] == s1[0])
+		{
+			char*temp = getSubString(s2, i, size1);
+			if(isEqual(temp, s1))
+				return true;
+
+			delete[] temp;
+		}
+	}
+
+	return false;
 }
 
 int countWords(const charPointer& s)
@@ -344,8 +392,26 @@ int countWords(const charPointer& s)
 		3. Assume there is no any tab in the cstring
 		4. Assume there is no any punctuation mark in the cstring.
 	*/
-	int count = 0;
-	
+	int count = 1;
+	int size = cstrlen(s);
+	if (size == 0)
+		return 0;
+
+	bool check = true;
+	for(int i=0; i<size; i++)
+	{
+		if (s[i] == ' ' && check == true)
+		{
+			count++;
+			check =false;
+		}
+		else if(s[i] != ' ' && check == false)
+			check = true;
+		else
+			continue;	
+	}
+
+	return count;
 }
 
 int main()
@@ -388,6 +454,7 @@ int main()
 	index = findChar(s1, ch);
 	cout << "ch='" << ch << "' is found in s1=\"" << s1 << "\" in the index interval [0, " << cstrlen(s1) << ") at index " << index << endl;
 
+	
 	//Test getCopy function
 	cout << endl << "Testing getCopy function";
 	cout << endl << "------------------------" << endl;
@@ -402,9 +469,12 @@ int main()
 	s3 = getCopy(s2);
 	cout << "A copy of s2=\"" << s2 << "\" is s3=\"" << s3 << "\"" << endl;
 
+	
 	//Test rotateString function
 	cout << endl << "Testing rotateString function";
 	cout << endl << "-----------------------------" << endl;
+
+
 	char s4[] = "asmara";
 	for (int i = 0; i < 10; i++)
 	{
@@ -417,6 +487,7 @@ int main()
 		cout << "\"" << s4 << "\"" << endl;
 	}
 
+
 	//Test empty function
 	cout << endl << "Testing empty function";
 	cout << endl << "----------------------" << endl;
@@ -426,6 +497,7 @@ int main()
 	empty(s2);
 	cout << s2 << "\"" << endl;
 
+	
 	//Test append function
 	cout << endl << "Testing append function";
 	cout << endl << "----------------------" << endl;
@@ -437,6 +509,7 @@ int main()
 		cout << s2 << "\"" << endl;
 	}
 
+	
 	//Test append function
 	cout << endl << "Testing append function";
 	cout << endl << "----------------------" << endl;
@@ -444,6 +517,7 @@ int main()
 	append(s3, s2);
 	cout << s3 << "\"" << endl;
 
+	
 	//Test removeChar function
 	cout << endl << "Testing removeChar function";
 	cout << endl << "---------------------------" << endl;
@@ -455,6 +529,7 @@ int main()
 		cout << s2 << "\"" << endl;
 	}
 
+	
 	//Test removeCharAll function
 	cout << endl << "Testing removeCharAll function";
 	cout << endl << "------------------------------" << endl;
@@ -463,6 +538,7 @@ int main()
 	removeCharAll(s3, ch);
 	cout << s3 << "\" (length = " << cstrlen(s3) << ")" << endl;
 
+	
 	//Test isEqual function
 	cout << endl << "Testing isEqual function";
 	cout << endl << "------------------------" << endl;
@@ -476,7 +552,8 @@ int main()
 		cout << "s2=\"" << s2 << "\" and s3=\"" << s3 << "\" are equal" << endl;
 	else
 		cout << "s2=\"" << s2 << "\" and s3=\"" << s3 << "\" are not equal" << endl;
-
+	
+	
 	//Test isAnagram function
 	cout << endl << "Testing isAnagram function";
 	cout << endl << "--------------------------" << endl;
@@ -495,7 +572,8 @@ int main()
 		cout << "s2=\"" << s2 << "\" and s3=\"" << s3 << "\" are anagrams" << endl;
 	else
 		cout << "s2=\"" << s2 << "\" and s3=\"" << s3 << "\" are not anagrams" << endl;
-
+	
+	
 	//Test zigzagMerge function
 	cout << endl << "Testing zigzagMerge function";
 	cout << endl << "----------------------------" << endl;
@@ -510,6 +588,7 @@ int main()
 	char* s5 = zigzagMerge(s2, s3);
 	cout << "The zigzag merge of s2=\"" << s2 << "\" and s3=\"" << s3 << "\" is s5=\"" << s5 << "\"" << endl;
 
+	
 	//Test getSubString function
 	cout << endl << "Testing getSubString function";
 	cout << endl << "-----------------------------" << endl;
@@ -521,6 +600,7 @@ int main()
 		cout << "\"" << getSubString(s1, index, len) << "\"" << endl;
 	}
 
+	
 	//Test isSubString function
 	cout << endl << "Testing isSubString function";
 	cout << endl << "----------------------------" << endl;
@@ -544,6 +624,7 @@ int main()
 	else
 		cout << "s2=\"" << s2 << "\" is not a substring of s3=\"" << s3 << "\"" << endl;
 
+	
 	//Test countWords function
 	cout << endl << "Testing countWords function";
 	cout << endl << "---------------------------" << endl;
@@ -567,6 +648,7 @@ int main()
 	cout << "Deleting s5."; delete[] s5; cout << " Done!" << endl;
 
 	cout << endl;
+
 	system("Pause");
 	return 0;
 }
