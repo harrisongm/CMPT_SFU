@@ -2,20 +2,35 @@
 #include <ctime>
 using namespace std;
 
-int combine(char& C1, char& C2)
+char* combine(char* C1, char* C2)
 {
-    int size = sizeof(C1) + sizeof(C2);
-    char* C3 = new char[size];
-    for(int i = 0; i < size; i++)
+    int c1size = 0;
+    while(C1[c1size] != '\0')
+        c1size++;
+    int c2size = 0;
+    while(C2[c2size] != '\0')
+        c2size++;
+    int tempsize = c1size + c2size + 1;
+    char* temp = new char[tempsize];
+    int index = 0;
+    while(index < c1size)
     {
-        
+            temp[index] = C1[index];
+            index++;
     }
+    for(int i = 0; i < c2size; i++)
+    {
+        temp[index] = C2[i];
+        index++;
+    }
+    temp[tempsize] = '\0';
+    return temp;
 }
 
 int main()
 {
     //create a C-string
-    const int len1 = rand()10 + 4;
+    const int len1 = rand()%10 + 4;
     char* C1 = new char[len1 + 1];
     for(int i = 0; i < len1; i++)
     {
